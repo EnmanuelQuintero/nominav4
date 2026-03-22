@@ -50,3 +50,7 @@ Route::get('/empleados/dias/{id}', [EmpleadoDiaController::class, 'obtenerPorEmp
     Route::get('/nominas', function () {
     return view('nominas.index');
 })->name('nominas.index');
+
+Route::get('/nominas/preview', function () {
+    return view('nominas.preview');
+})->name('nominas.preview');

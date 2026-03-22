@@ -100,9 +100,10 @@
                         <td class="text-center">
                             <div class="d-flex justify-content-center gap-2">
 
-                                <button class="btn btn-sm btn-primary rounded-pill">
-                                    Ver
-                                </button>
+                            <a href="{{ route('nominas.preview') }}" 
+                            class="btn btn-sm btn-primary rounded-pill">
+                                Ver
+                            </a>
 
                                 <button class="btn btn-sm btn-outline-success rounded-pill">
                                     Detalle
