@@ -31,26 +31,27 @@ class EmpleadoDiaController extends Controller
 
         //  MANEJO DE HORAS EXTRAS
 
-        // Si NO es trabajado → eliminar extras si existen
-        if ($request->tipo !== 'trabajado') {
-            $dia->horasExtras()->delete();
-        }
+        if ($request->tipo === 'trabajado') {
 
-        // Si es trabajado y tiene horas extras
-        if ($request->tipo === 'trabajado' && $request->has('horas')) {
+            $horas = $request->horas ?? 0;
 
-            // Si ya existe → actualizar
-            if ($dia->horasExtras) {
-                $dia->horasExtras->update([
-                    'cantidad_horas' => $request->horas
-                ]);
+            if ($horas > 0) {
+
+                if ($dia->horasExtras) {
+                    $dia->horasExtras->update([
+                        'cantidad_horas' => $horas
+                    ]);
+                } else {
+                    HoraExtra::create([
+                        'empleado_dia_id' => $dia->id,
+                        'cantidad_horas' => $horas,
+                        'pagada' => false
+                    ]);
+                }
+
             } else {
-                // Crear
-                HoraExtra::create([
-                    'empleado_dia_id' => $dia->id,
-                    'cantidad_horas' => $request->horas,
-                    'pagada' => false
-                ]);
+                // 🔥 si manda 0 → eliminar
+                $dia->horasExtras()->delete();
             }
         }
 

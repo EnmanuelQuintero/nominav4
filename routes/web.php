@@ -47,10 +47,32 @@ Route::get('/empleados/dias/{id}', [EmpleadoDiaController::class, 'obtenerPorEmp
     ->name('empleados.dias.obtener');
 
 
-    Route::get('/nominas', function () {
-    return view('nominas.index');
-})->name('nominas.index');
+use App\Http\Controllers\NominaController;
 
-Route::get('/nominas/preview', function () {
-    return view('nominas.preview');
-})->name('nominas.preview');
+// Listado de nóminas (index)
+Route::get('/nominas', [NominaController::class, 'index'])->name('nominas.index');
+
+// Generar preview (POST desde el form de fechas)
+Route::post('/nominas/preview', [NominaController::class, 'preview'])->name('nominas.preview');
+
+// Guardar nómina final (POST desde el botón "Guardar Nómina")
+Route::post('/nominas/store', [NominaController::class, 'store'])->name('nominas.store');
+
+
+use App\Http\Controllers\ConfiguracionNominaController;
+
+Route::prefix('configuracion-nomina')->group(function () {
+
+    Route::get('/', [ConfiguracionNominaController::class, 'index'])
+        ->name('config.index');
+
+    Route::post('/parametros', [ConfiguracionNominaController::class, 'guardarParametros'])
+        ->name('config.nomina.parametros');
+
+    Route::post('/ir', [ConfiguracionNominaController::class, 'guardarIR'])
+        ->name('config.nomina.ir');
+
+    Route::delete('/ir/{id}', [ConfiguracionNominaController::class, 'eliminarIR'])
+        ->name('config.nomina.ir.delete');
+
+});

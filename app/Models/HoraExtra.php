@@ -19,4 +19,8 @@ class HoraExtra extends Model
     {
         return $this->belongsTo(EmpleadoDia::class);
     }
+    public function dia()
+    {
+        return $this->belongsTo(EmpleadoDia::class, 'empleado_dia_id');
+    }
 }

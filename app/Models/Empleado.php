@@ -36,7 +36,10 @@ class Empleado extends Model
     | RELACIONES
     |--------------------------------------------------------------------------
     */
-
+    public function dias()
+    {
+        return $this->hasMany(EmpleadoDia::class);
+    }
     public function cargo()
     {
         return $this->belongsTo(Cargo::class);

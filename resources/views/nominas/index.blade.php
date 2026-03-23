@@ -9,45 +9,51 @@
         <div class="col-md-3">
             <div class="card shadow-sm border-0 rounded-4 p-3">
                 <h6 class="text-muted">Total Nóminas</h6>
-                <h3 class="fw-bold">12</h3>
+                <h3 class="fw-bold">{{ $totalNominas }}</h3>
             </div>
         </div>
 
         <div class="col-md-3">
             <div class="card shadow-sm border-0 rounded-4 p-3">
                 <h6 class="text-muted">Total Pagado</h6>
-                <h3 class="fw-bold text-success">C$ 350,000</h3>
+                <h3 class="fw-bold text-success">
+                    C$ {{ number_format($totalPagado,2) }}
+                </h3>
             </div>
         </div>
 
         <div class="col-md-3">
             <div class="card shadow-sm border-0 rounded-4 p-3">
                 <h6 class="text-muted">Empleados</h6>
-                <h3 class="fw-bold">25</h3>
+                <h3 class="fw-bold">{{ $totalEmpleados }}</h3>
             </div>
         </div>
 
         <div class="col-md-3">
             <div class="card shadow-sm border-0 rounded-4 p-3">
                 <h6 class="text-muted">Horas Extras</h6>
-                <h3 class="fw-bold text-warning">120h</h3>
+                <h3 class="fw-bold text-warning">
+                    {{ $totalHorasExtras }}h
+                </h3>
             </div>
         </div>
 
     </div>
 
-    {{-- 🔥 HEADER --}}
+    {{-- HEADER --}}
     <div class="d-flex justify-content-between align-items-center mb-3">
 
         <h5 class="fw-bold">Listado de Nóminas</h5>
 
-        <button class="btn btn-success rounded-pill shadow-sm">
+        <button class="btn btn-success rounded-pill shadow-sm"
+                data-bs-toggle="modal"
+                data-bs-target="#modalCrearNomina">
             + Nueva Nómina
         </button>
 
     </div>
 
-    {{-- 🔥 TABLA --}}
+    {{-- TABLA --}}
     <div class="card shadow-sm border-0 rounded-4">
         <div class="card-body">
 
@@ -67,29 +73,37 @@
 
                 <tbody>
 
-                    @for($i = 1; $i <= 6; $i++)
+                    @forelse($nominas as $nomina)
                     <tr>
 
-                        <td>#00{{ $i }}</td>
+                        <td>
+                            <strong>{{ $nomina->codigo ?? 'N/A' }}</strong>
+                        </td>
 
                         <td>
-                            <strong>Marzo 2026</strong>
+                            <strong>
+                                {{ \Carbon\Carbon::parse($nomina->fecha_inicio)->format('F Y') }}
+                            </strong>
                             <br>
                             <small class="text-muted">
-                                Quincena {{ $i % 2 == 0 ? '2' : '1' }}
+                                {{ \Carbon\Carbon::parse($nomina->fecha_inicio)->day <= 15 ? 'Quincena 1' : 'Quincena 2' }}
                             </small>
                         </td>
 
-                        <td>2026-03-{{ 10 + $i }}</td>
-
-                        <td>{{ rand(20,30) }}</td>
-
-                        <td class="fw-bold text-success">
-                            C$ {{ number_format(rand(200000,400000), 2) }}
+                        <td>
+                            {{ \Carbon\Carbon::parse($nomina->fecha_fin)->format('d/m/Y') }}
                         </td>
 
                         <td>
-                            @if($i % 2 == 0)
+                            {{ $nomina->detalles->count() ?? 0 }}
+                        </td>
+
+                        <td class="fw-bold text-success">
+                            C$ {{ number_format($nomina->total_neto, 2) }}
+                        </td>
+
+                        <td>
+                            @if($nomina->estado == 'Pagada')
                                 <span class="badge bg-success">Pagada</span>
                             @else
                                 <span class="badge bg-warning text-dark">Pendiente</span>
@@ -99,10 +113,10 @@
                         <td class="text-center">
                             <div class="d-flex justify-content-center gap-2">
 
-                            <a href="{{ route('nominas.preview') }}" 
-                            class="btn btn-sm btn-primary rounded-pill">
-                                Ver
-                            </a>
+                                <a href=""
+                                   class="btn btn-sm btn-primary rounded-pill">
+                                    Ver
+                                </a>
 
                                 <button class="btn btn-sm btn-outline-success rounded-pill">
                                     Detalle
@@ -116,7 +130,13 @@
                         </td>
 
                     </tr>
-                    @endfor
+                    @empty
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            No hay nóminas registradas
+                        </td>
+                    </tr>
+                    @endforelse
 
                 </tbody>
 
@@ -126,5 +146,8 @@
     </div>
 
 </div>
+
+
+@include("nominas.components.modalCrearNomina")
 
 @endsection

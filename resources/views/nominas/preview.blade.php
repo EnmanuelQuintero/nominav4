@@ -5,33 +5,34 @@
 <div class="container-fluid mt-4">
 
     {{-- 🔥 RESUMEN --}}
+    {{-- 🔥 RESUMEN --}}
     <div class="row mb-4">
 
         <div class="col-md-3">
             <div class="card shadow-sm p-3 text-center">
                 <h6>Total Devengado</h6>
-                <h4 class="text-success">C$ 85,000</h4>
+                <h4 class="text-success">C$ {{ number_format($resumen['devengado'], 2) }}</h4>
             </div>
         </div>
 
         <div class="col-md-3">
             <div class="card shadow-sm p-3 text-center">
                 <h6>Total Deducciones</h6>
-                <h4 class="text-danger">C$ 12,500</h4>
+                <h4 class="text-danger">C$ {{ number_format($resumen['deducciones'], 2) }}</h4>
             </div>
         </div>
 
         <div class="col-md-3">
             <div class="card shadow-sm p-3 text-center">
                 <h6>Total Neto a Pagar</h6>
-                <h4 class="text-primary">C$ 72,500</h4>
+                <h4 class="text-primary">C$ {{ number_format($resumen['neto'], 2) }}</h4>
             </div>
         </div>
 
         <div class="col-md-3">
             <div class="card shadow-sm p-3 text-center">
                 <h6>Costo Empresa</h6>
-                <h4 class="text-warning">C$ 100,000</h4>
+                <h4 class="text-warning">C$ {{ number_format($resumen['empresa'], 2) }}</h4>
             </div>
         </div>
 
@@ -42,9 +43,17 @@
 
         <h5 class="fw-bold">Listado de Nóminas</h5>
 
-        <button class="btn btn-success rounded-pill shadow-sm">
-            + Nueva Nómina
-        </button>
+        {{-- 🔥 BOTÓN GUARDAR NÓMINA --}}
+        <form action="{{ route('nominas.store') }}" method="POST">
+            @csrf
+            <input type="hidden" name="detalles" value='@json($detallesAgrupados)'>
+            <input type="hidden" name="fecha_inicio" value="{{ $fechaInicio }}">
+            <input type="hidden" name="fecha_fin" value="{{ $fechaFin }}">
+
+            <button type="submit" class="btn btn-success rounded-pill shadow-sm">
+                💾 Guardar Nómina
+            </button>
+        </form>
 
     </div>
 
@@ -105,86 +114,107 @@
 
                     <tbody>
 
-                    @php
-                    $areas = [
-                        'Administración',
-                        'Recursos Humanos',
-                        'Contabilidad'
-                    ];
-                    @endphp
+                    @foreach($detallesAgrupados as $area => $empleados)
 
-                    @foreach($areas as $area)
-
-                        {{-- 🔵 TITULO DEL AREA --}}
+                        {{-- 🔵 AREA --}}
                         <tr class="fila-area">
                             <td colspan="22" class="text-start fw-bold">
                                 🏢 {{ $area }}
                             </td>
                         </tr>
 
-                        {{-- 🔥 EMPLEADOS DEL AREA --}}
-                        @for($i = 1; $i <= 3; $i++)
+                        @php
+                            $subDevengado = 0;
+                            $subDeduccion = 0;
+                            $subNeto = 0;
+                        @endphp
+
+                        {{-- 🔥 EMPLEADOS --}}
+                        @foreach($empleados as $emp)
+
+                        @php
+                            $subDevengado += $emp['devengado'];
+                            $subDeduccion += $emp['deduccion'];
+                            $subNeto += $emp['neto'];
+                        @endphp
+
                         <tr>
 
-                            {{-- EMPLEADO --}}
-                            <td>EMP-{{ rand(100,999) }}</td>
+                            <td>{{ $emp['numero'] }}</td>
 
                             <td class="text-start">
-                                <strong>{{ $area }} - Emp {{ $i }}</strong>
+                                <strong>{{ $emp['nombre'] }}</strong>
                             </td>
 
-                            <td>Administrador</td>
-                            <td>12345678</td>
-                            <td>C$ 15,000</td>
-                            <td>C$ 500</td>
-                            <td>13</td>
+                            <td>{{ $emp['cargo'] }}</td>
+                            <td>{{ $emp['inss'] }}</td>
 
-                            {{-- INGRESOS --}}
-                            <td>C$ 6,500</td>
-                            <td>5</td>
-                            <td class="text-success">C$ 1,200</td>
-                            <td>2</td>
-                            <td class="text-info">C$ 800</td>
-                            <td>C$ 300</td>
-                            <td class="fw-bold text-success">C$ 8,800</td>
+                            <td>C$ {{ number_format($emp['salario_mensual'],2) }}</td>
+                            <td>C$ {{ number_format($emp['salario_diario'],2) }}</td>
+                            <td>{{ $emp['dias_trabajados'] }}</td>
 
-                            {{-- DEDUCCIONES --}}
-                            <td class="text-danger">C$ 616</td>
-                            <td class="text-danger">C$ 300</td>
-                            <td class="fw-bold text-danger">C$ 916</td>
+                            <td>C$ {{ number_format($emp['salario_quincenal'],2) }}</td>
+                            <td>{{ $emp['horas_extra'] }}</td>
+                            <td>C$ {{ number_format($emp['monto_horas'],2) }}</td>
 
-                            {{-- NETO --}}
-                            <td class="fw-bold text-primary">C$ 7,884</td>
+                            <td>{{ $emp['dias_subsidio'] }}</td>
+                            <td>C$ {{ number_format($emp['subsidio'],2) }}</td>
 
-                            {{-- APORTES --}}
-                            <td class="text-warning">C$ 176</td>
-                            <td class="text-warning">C$ 1,980</td>
+                            <td>C$ {{ number_format($emp['feriado'],2) }}</td>
+
+                            <td class="fw-bold text-success">
+                                C$ {{ number_format($emp['devengado'],2) }}
+                            </td>
+
+                            <td class="text-danger">
+                                C$ {{ number_format($emp['inss_deduccion'],2) }}
+                            </td>
+
+                            <td class="text-danger">
+                                C$ {{ number_format($emp['ir'],2) }}
+                            </td>
+
+                            <td class="fw-bold text-danger">
+                                C$ {{ number_format($emp['deduccion'],2) }}
+                            </td>
+
+                            <td class="fw-bold text-primary">
+                                C$ {{ number_format($emp['neto'],2) }}
+                            </td>
+
+                            <td class="text-warning">
+                                C$ {{ number_format($emp['inatec'],2) }}
+                            </td>
+
+                            <td class="text-warning">
+                                C$ {{ number_format($emp['inss_patronal'],2) }}
+                            </td>
 
                             {{-- FIRMA --}}
                             <td style="min-width:140px;">
                                 <div style="height:45px; border-bottom:1px solid #000;"></div>
-                                <small class="text-muted">Recibí conforme</small>
                             </td>
 
                         </tr>
-                        @endfor
+                        @endforeach
 
                         {{-- 🟣 SUBTOTAL POR AREA --}}
                         <tr class="fila-subtotal">
+
                             <td colspan="13"></td>
 
                             <td class="fw-bold text-success">
-                                C$ 26,400
+                                C$ {{ number_format($subDevengado,2) }}
                             </td>
 
                             <td colspan="2"></td>
 
                             <td class="fw-bold text-danger">
-                                C$ 2,748
+                                C$ {{ number_format($subDeduccion,2) }}
                             </td>
 
                             <td class="fw-bold text-primary">
-                                C$ 23,652
+                                C$ {{ number_format($subNeto,2) }}
                             </td>
 
                             <td colspan="2"></td>

@@ -87,8 +87,11 @@
                 <!-- Input -->
                 <div class="col-6" id="inputHoras" style="display:none">
                     <input type="number"
-                           class="form-control"
-                           placeholder="Horas">
+                        name="horas"
+                        class="form-control"
+                        placeholder="Horas"
+                        min="0"
+                        step="0.5">
                 </div>
 
             </div>

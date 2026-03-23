@@ -93,6 +93,13 @@
                 </a>
             </li>
 
+            <li class="nav-item">
+                <a href="{{ route('config.index') }}" class="nav-link text-white">
+                    <i class="bi bi-person-gear me-2"></i>
+                    Configuracion
+                </a>
+            </li>
+
         </ul>
 
     </div>

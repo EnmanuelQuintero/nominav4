@@ -14,6 +14,8 @@ class EmpleadoDia extends Model
         'tipo'
     ];
 
+    
+
     // 🔹 RELACIÓN: pertenece a empleado
     public function empleado()
     {
