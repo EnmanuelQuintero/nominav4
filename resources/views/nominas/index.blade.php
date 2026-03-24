@@ -113,8 +113,8 @@
                         <td class="text-center">
                             <div class="d-flex justify-content-center gap-2">
 
-                                <a href=""
-                                   class="btn btn-sm btn-primary rounded-pill">
+                                <a href="{{ route('nominas.show', $nomina->id) }}"
+                                class="btn btn-sm btn-primary rounded-pill">
                                     Ver
                                 </a>
 

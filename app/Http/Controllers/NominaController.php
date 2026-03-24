@@ -16,7 +16,7 @@ class NominaController extends Controller
 {
     public function index()
     {
-        $nominas = Nomina::latest()->get();
+        $nominas = Nomina::with('detalles')->latest()->get();
 
         // 🔥 RESUMEN
         $totalNominas = $nominas->count();
@@ -127,10 +127,16 @@ class NominaController extends Controller
             $irMensual = 0;
             foreach($tablaIR as $tramo){
                 if($baseIRMensual >= $tramo->desde && ($tramo->hasta === null || $baseIRMensual <= $tramo->hasta)){
-                    $exceso = $baseIRMensual - ($tramo->desde-1);
-                    //dd($exceso);
-                    $irMensual = ($exceso * ($tramo->porcentaje / 100)) + $tramo->base;
-                    $irMensual = $irMensual / 12;
+
+                    $exceso = round($baseIRMensual - ($tramo->desde - 1), 2);
+
+                    $irMensual = round(
+                        ($exceso * ($tramo->porcentaje / 100)) + $tramo->base,
+                        2
+                    );
+
+                    $irMensual = round($irMensual / 12, 2);
+
                     break;
                 }
             }
@@ -268,5 +274,17 @@ public function store(Request $request)
                      ->with('success','Nómina guardada correctamente');
 }
 
+
+public function show($id)
+{
+    $nomina = Nomina::with('detalles')->findOrFail($id);
+
+    // 🔥 Agrupar por área (si no guardaste área, usamos cargo como fallback)
+    $detallesAgrupados = $nomina->detalles->groupBy(function($item){
+        return $item->cargo ?? 'Sin área';
+    });
+
+    return view('nominas.show', compact('nomina','detallesAgrupados'));
+}
 
 }

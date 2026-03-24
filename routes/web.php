@@ -58,6 +58,7 @@ Route::post('/nominas/preview', [NominaController::class, 'preview'])->name('nom
 // Guardar nómina final (POST desde el botón "Guardar Nómina")
 Route::post('/nominas/store', [NominaController::class, 'store'])->name('nominas.store');
 
+Route::get('/nominas/{id}', [NominaController::class, 'show'])->name('nominas.show');
 
 use App\Http\Controllers\ConfiguracionNominaController;
 
