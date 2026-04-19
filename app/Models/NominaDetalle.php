@@ -15,6 +15,7 @@ class NominaDetalle extends Model
         'numero_empleado',
         'nombre',
         'cargo',
+        'area',
         'inss',
 
         'salario_mensual',

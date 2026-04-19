@@ -1,0 +1,108 @@
+/* 🔥 CONTENEDOR */
+.table-empleados {
+    font-size: 14px;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+/* 🔥 HEADER SUAVE */
+.thead-soft {
+    background-color: #f5f7fa;
+    color: #344054;
+    font-weight: 600;
+}
+
+.thead-soft th {
+    border-bottom: 2px solid #e4e7ec;
+    padding: 12px;
+}
+
+/* 🔥 FILAS */
+.fila-empleado {
+    background-color: #ffffff;
+    transition: all 0.2s ease;
+}
+
+.fila-empleado:hover {
+    background-color: #f9fafb;
+}
+
+/* 🔥 FILA DE ÁREA */
+.fila-area {
+    background-color: #eef2f7;
+}
+
+.fila-area td {
+    font-size: 13px;
+    color: #475467;
+    padding: 8px 12px;
+    border-top: 1px solid #e4e7ec;
+}
+
+/* 🔥 FOTO */
+.foto-tabla {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 1px solid #e4e7ec;
+}
+
+/* 🔥 ESTADO */
+.estado-pill {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.estado-pill.activo {
+    background-color: #ecfdf3;
+    color: #027a48;
+}
+
+.estado-pill.inactivo {
+    background-color: #fef3f2;
+    color: #b42318;
+}
+
+/* 🔥 BOTONES */
+.accion-btn {
+    border-radius: 8px;
+    padding: 4px 8px;
+    border: 1px solid #e4e7ec;
+    background-color: #ffffff;
+    transition: all 0.2s ease;
+}
+
+.accion-btn:hover {
+    background-color: #f2f4f7;
+    transform: scale(1.05);
+}
+
+/* 🔥 SALARIO */
+.table-empleados td.text-success {
+    color: #067647 !important;
+    font-weight: 600;
+}
+
+/* 🔥 CELDAS */
+.table-empleados td {
+    padding: 12px;
+    border-bottom: 1px solid #f2f4f7;
+}
+
+/* 🔥 SCROLL BONITO */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.table-responsive::-webkit-scrollbar {
+    height: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background-color: #d0d5dd;
+    border-radius: 10px;
+}

@@ -160,6 +160,7 @@ class NominaController extends Controller
                 'nombre' => $emp->nombre,
                 'cargo' => $emp->cargo->nombre,
                 'inss' => $emp->inss,
+                
 
                 'salario_mensual' => $salarioMensual,
                 'salario_diario' => $salarioDiario,
@@ -246,6 +247,7 @@ public function store(Request $request)
             NominaDetalle::create([
                 'nomina_id' => $nomina->id,
                 'empleado_id' => $emp['id'], // <-- ahora sí tenemos el ID real
+                'area' => $area,
                 'numero_empleado' => $emp['numero'],
                 'nombre' => $emp['nombre'],
                 'cargo' => $emp['cargo'],

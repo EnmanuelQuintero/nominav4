@@ -122,9 +122,10 @@
                                     Detalle
                                 </button>
 
-                                <button class="btn btn-sm btn-outline-secondary rounded-pill">
+                                <a href="{{ route('nominas.pdf', $nomina->id) }}"
+                                class="btn btn-sm btn-outline-secondary rounded-pill">
                                     PDF
-                                </button>
+                                </a>
 
                             </div>
                         </td>

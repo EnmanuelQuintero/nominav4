@@ -1,7 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
-
+    @push('css')
+        <link rel="stylesheet" href="{{ asset('css/nomina/tabla.css') }}">
+    @endpush
 <div class="container-fluid mt-4">
 
     {{-- 🔥 RESUMEN --}}

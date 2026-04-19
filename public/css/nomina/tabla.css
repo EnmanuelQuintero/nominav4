@@ -1,0 +1,94 @@
+
+.flex-grow-1 
+{
+    overflow: hidden; /* 🔥 clave */
+    max-width: calc(100vw - 250px); /* 🔥 respeta sidebar */
+}
+/* 🔥 SCROLL HORIZONTAL PRO */
+.tabla-nomina-scroll {
+    position: relative;
+    overflow: auto;
+    max-height: calc(90vh - 220px); /* 🔥 dinámico según pantalla */
+    width: 100%;
+    border-radius: 12px;
+    background: #fff;
+}
+
+
+/* 🔥 EVITA QUE EL TEXTO SE BAJE */
+.tabla-nomina th,
+.tabla-nomina td {
+    white-space: nowrap;
+    font-size: 13px;
+    padding: 10px 14px;
+}
+
+
+/* 🔥 HEADER FIJO (PRO) */
+.tabla-nomina thead th {
+
+    top: 0;
+    z-index: 2;
+}
+
+/* 🔥 PRIMERAS COLUMNAS FIJAS (MUY PRO) */
+.tabla-nomina td:first-child,
+.tabla-nomina th:first-child {
+
+    left: 0;
+    background: transparent;
+    z-index: 2;
+    color: #000;
+}
+
+.tabla-nomina td:nth-child(2),
+.tabla-nomina th:nth-child(2) {
+
+    
+    background: #fff;
+    z-index: 2;
+}
+
+/* 🔥 EFECTO HOVER MÁS LIMPIO */
+.tabla-nomina tbody tr:hover {
+    background-color: #f5f7fa;
+    transition: 0.2s;
+}
+
+/* 🔥 SCROLL BONITO */
+.tabla-nomina-scroll::-webkit-scrollbar {
+    height: 10px;
+}
+
+.tabla-nomina-scroll::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 10px;
+}
+
+
+/* 🔵 FILA AREA */
+.fila-area td{
+    background: linear-gradient(90deg, #0d6efd, #0b5ed7);
+    color: black;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+    padding: 10px;
+    position: relative; /* 🔥 clave */
+    z-index: 1;
+    
+}
+
+/* 🟣 SUBTOTAL */
+.fila-subtotal td{
+    background: #f8f9fa;
+    border-top: 2px solid #dee2e6;
+    font-size: 13px;
+    position: relative; /* 🔥 clave */
+    z-index: 1;
+}
+
+/* 🔥 HOVER MÁS SUAVE */
+.tabla-nomina tbody tr:hover{
+    background-color: rgba(0,0,0,0.03);
+    transition: 0.2s;
+}

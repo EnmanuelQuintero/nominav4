@@ -10,27 +10,47 @@ class EmpleadoDiaController extends Controller
 {
 
     // 🔹 GUARDAR / ACTUALIZAR DIA
-    public function store(Request $request)
-    {
-        $request->validate([
-            'empleado_id' => 'required|exists:empleados,id',
-            'fecha' => 'required|date',
-            'tipo' => 'required'
-        ]);
+public function store(Request $request)
+{
+    $request->validate([
+        'empleado_id' => 'required|exists:empleados,id',
+        'tipo' => 'required',
+        'fecha' => 'nullable|date',
+        'fechas' => 'nullable|array'
+    ]);
 
-        // Crear o actualizar día
+    // 🔥 Normalizamos → siempre trabajar como array
+    $fechas = [];
+
+    if ($request->fecha) {
+        $fechas[] = $request->fecha;
+    }
+
+    if ($request->fechas) {
+        $fechas = array_merge($fechas, $request->fechas);
+    }
+
+    if (empty($fechas)) {
+        return response()->json([
+            'success' => false,
+            'mensaje' => 'Debe seleccionar al menos un día'
+        ], 422);
+    }
+
+    foreach ($fechas as $fecha) {
+
+        // 🔹 Crear o actualizar día
         $dia = EmpleadoDia::updateOrCreate(
             [
                 'empleado_id' => $request->empleado_id,
-                'fecha' => $request->fecha
+                'fecha' => $fecha
             ],
             [
                 'tipo' => $request->tipo
             ]
         );
 
-        //  MANEJO DE HORAS EXTRAS
-
+        // 🔥 HORAS EXTRAS
         if ($request->tipo === 'trabajado') {
 
             $horas = $request->horas ?? 0;
@@ -53,14 +73,18 @@ class EmpleadoDiaController extends Controller
                 // 🔥 si manda 0 → eliminar
                 $dia->horasExtras()->delete();
             }
-        }
 
-        return response()->json([
-            'success' => true,
-            'mensaje' => 'Día guardado correctamente'
-        ]);
+        } else {
+            // 🔥 cualquier otro tipo elimina horas extras
+            $dia->horasExtras()->delete();
+        }
     }
 
+    return response()->json([
+        'success' => true,
+        'mensaje' => 'Días guardados correctamente'
+    ]);
+}
     // 🔹 OBTENER DATOS DEL CALENDARIO
     public function obtenerPorEmpleado($empleado_id)
     {

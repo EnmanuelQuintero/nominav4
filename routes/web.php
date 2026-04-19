@@ -77,3 +77,8 @@ Route::prefix('configuracion-nomina')->group(function () {
         ->name('config.nomina.ir.delete');
 
 });
+
+use App\Http\Controllers\NominaExportController;
+
+Route::get('/nominas/{id}/pdf', [NominaExportController::class, 'pdf'])
+    ->name('nominas.pdf');
