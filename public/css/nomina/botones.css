@@ -1,0 +1,74 @@
+/* 🔥 CONTENEDOR */
+.acciones-nomina {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* 🔘 BOTÓN BASE */
+.btn-accion {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    font-size: 13px;
+    border-radius: 999px;
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+/* 👁 VER */
+.btn-ver {
+    background: #f0f4ff;
+    color: #3b5bdb;
+}
+.btn-ver:hover {
+    background: #3b5bdb;
+    color: #fff;
+}
+
+/* 📄 PDF */
+.btn-pdf {
+    background: #f5f6f7;
+    color: #495057;
+}
+.btn-pdf:hover {
+    background: #343a40;
+    color: #fff;
+}
+
+/* ✔ PAGAR */
+.btn-pagar {
+    background: #edf7f0;
+    color: #2f9e44;
+}
+.btn-pagar:hover {
+    background: #2f9e44;
+    color: #fff;
+}
+
+/* 🔥 ESTADO */
+.estado-pill {
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* 🟢 PAGADA */
+.estado-pagada {
+    background: #e6f4ea;
+    color: #2f9e44;
+}
+
+.btn-csv {
+    background: #e7f5ff;
+    color: #1c7ed6;
+}
+.btn-csv:hover {
+    background: #1c7ed6;
+    color: #fff;
+}

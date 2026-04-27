@@ -7,7 +7,6 @@
 <div class="container-fluid mt-4">
 
     {{-- 🔥 RESUMEN --}}
-    {{-- 🔥 RESUMEN --}}
     <div class="row mb-4">
 
         <div class="col-md-3">

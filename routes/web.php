@@ -52,6 +52,9 @@ use App\Http\Controllers\NominaController;
 // Listado de nóminas (index)
 Route::get('/nominas', [NominaController::class, 'index'])->name('nominas.index');
 
+Route::patch('/nominas/{id}/pagar', [NominaController::class, 'pagar'])
+->name('nominas.pagar');
+
 // Generar preview (POST desde el form de fechas)
 Route::post('/nominas/preview', [NominaController::class, 'preview'])->name('nominas.preview');
 
@@ -82,3 +85,23 @@ use App\Http\Controllers\NominaExportController;
 
 Route::get('/nominas/{id}/pdf', [NominaExportController::class, 'pdf'])
     ->name('nominas.pdf');
+
+
+Route::get('/nominas/{id}/csv', [NominaExportController::class, 'csv'])
+->name('nominas.csv');
+
+Route::get('/nominas/comprobante/{id}', [NominaExportController::class, 'comprobante'])
+    ->name('nominas.comprobante');
+
+
+
+//Reportes
+
+use App\Http\Controllers\ReporteController;
+
+
+Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
+
+Route::get('/reportes/nomina/{id}', [ReporteController::class, 'empleadosPorNomina']);
+
+Route::post('/reportes/solvencias', [ReporteController::class, 'generarSolvencias']);

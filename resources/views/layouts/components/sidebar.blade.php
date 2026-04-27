@@ -51,7 +51,7 @@
         </li>
 
         <li class="nav-item">
-            <a href="#" class="nav-link text-white">
+            <a href="{{ route('reportes.index') }}" class="nav-link text-white">
                <i class="bi bi-bar-chart me-2"></i>
                Reportes
             </a>

@@ -61,6 +61,24 @@ class NominaController extends Controller
         $fechaInicio = $request->fecha_inicio;
         $fechaFin = $request->fecha_fin;
 
+
+        // 🔥 VALIDAR CRUCE ANTES DE TODO
+        $existe = Nomina::where(function ($query) use ($fechaInicio, $fechaFin) {
+            $query->whereBetween('fecha_inicio', [$fechaInicio, $fechaFin])
+                ->orWhereBetween('fecha_fin', [$fechaInicio, $fechaFin])
+                ->orWhere(function ($q) use ($fechaInicio, $fechaFin) {
+                    $q->where('fecha_inicio', '<=', $fechaInicio)
+                    ->where('fecha_fin', '>=', $fechaFin);
+                });
+        })->exists();
+
+        if ($existe) {
+            return back()->withErrors([
+                'fecha' => 'Ya existe una nómina registrada en ese rango de fechas'
+            ])->withInput();
+        }
+
+        
         // 🔥 EMPLEADOS ACTIVOS
         $empleados = Empleado::with('cargo.area')
             ->where('estado','Activo')
@@ -214,14 +232,14 @@ public function store(Request $request)
 
     $fechaInicio = $request->fecha_inicio;
     $fechaFin = $request->fecha_fin;
-    $detalles = json_decode($request->detalles, true); // array de detalles por área
+    $detalles = json_decode($request->detalles, true);
 
     $totalDevengado = 0;
     $totalDeducciones = 0;
     $totalNeto = 0;
     $costoEmpresa = 0;
 
-    // 🔥 Calculamos los totales directamente desde los detalles del preview
+    // 🔥 CALCULAR TOTALES PRIMERO
     foreach ($detalles as $area => $empleados) {
         foreach ($empleados as $emp) {
             $totalDevengado += $emp['devengado'];
@@ -231,22 +249,28 @@ public function store(Request $request)
         }
     }
 
-    // 🔥 Creamos la nómina ya con los totales
+    // 🔥 GENERAR CODIGO (ej: NOM-2026-03-001)
+    $contador = Nomina::count() + 1;
+    $codigo = 'NOM-' . now()->format('Y-m') . '-' . str_pad($contador, 3, '0', STR_PAD_LEFT);
+
+    // 🔥 CREAR NOMINA YA CON DATOS REALES
     $nomina = Nomina::create([
+        'codigo' => $codigo,
         'fecha_inicio' => $fechaInicio,
         'fecha_fin' => $fechaFin,
         'total_devengado' => $totalDevengado,
         'total_deducciones' => $totalDeducciones,
         'total_neto' => $totalNeto,
-        'total_empresa' => $costoEmpresa
+        'total_empresa' => $costoEmpresa,
+        'estado' => 'Pendiente'
     ]);
 
-    // 🔥 Guardamos cada detalle directamente desde los datos del preview
+    // 🔥 GUARDAR DETALLES
     foreach ($detalles as $area => $empleados) {
         foreach ($empleados as $emp) {
             NominaDetalle::create([
                 'nomina_id' => $nomina->id,
-                'empleado_id' => $emp['id'], // <-- ahora sí tenemos el ID real
+                'empleado_id' => $emp['id'],
                 'area' => $area,
                 'numero_empleado' => $emp['numero'],
                 'nombre' => $emp['nombre'],
@@ -276,17 +300,31 @@ public function store(Request $request)
                      ->with('success','Nómina guardada correctamente');
 }
 
-
 public function show($id)
 {
     $nomina = Nomina::with('detalles')->findOrFail($id);
 
     // 🔥 Agrupar por área (si no guardaste área, usamos cargo como fallback)
     $detallesAgrupados = $nomina->detalles->groupBy(function($item){
-        return $item->cargo ?? 'Sin área';
+        return $item->area ?? 'Sin área';
     });
 
     return view('nominas.show', compact('nomina','detallesAgrupados'));
 }
 
+    public function pagar($id)
+    {
+        $nomina = Nomina::findOrFail($id);
+
+        // 🔥 evitar reprocesar
+        if($nomina->estado === 'Pagada'){
+            return back()->with('error', 'Esta nómina ya fue pagada');
+        }
+
+        $nomina->update([
+            'estado' => 'Pagada'
+        ]);
+
+        return back()->with('success', 'Nómina marcada como pagada');
+    }
 }

@@ -102,7 +102,7 @@
                         {{-- APORTES --}}
                         <th>INATEC</th>
                         <th>INSS Patronal</th>
-
+                        <th>Acciones</th>   
                     </tr>
 
                 </thead>
@@ -113,7 +113,7 @@
 
                         {{-- 🔵 GRUPO --}}
                         <tr class="table-light">
-                            <td colspan="20" class="text-start fw-bold">
+                            <td colspan="21" class="text-start fw-bold">
                                 🏢 {{ $grupo }}
                             </td>
                         </tr>
@@ -175,7 +175,14 @@
                             <td class="text-warning">
                                 C$ {{ number_format($emp->detalle_inss_patronal,2) }}
                             </td>
+                            <td class="text-center">
 
+                                <a href="{{ route('nominas.comprobante', $emp->id) }}"
+                                class="btn btn-sm btn-outline-dark rounded-pill px-3">
+                                    Detalle
+                                </a>
+
+                            </td>
                         </tr>
                         @endforeach
 

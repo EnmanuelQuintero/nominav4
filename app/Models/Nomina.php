@@ -13,9 +13,9 @@ class Nomina extends Model
         'total_devengado',
         'total_deducciones',
         'total_neto',
-        'total_empresa'
+        'total_empresa',
+        'estado'
     ];
-
     // 🔥 RELACIÓN: una nómina tiene muchos detalles
     public function detalles()
     {

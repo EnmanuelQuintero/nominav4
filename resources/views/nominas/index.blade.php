@@ -1,6 +1,20 @@
 @extends('layouts.app')
 @section('content')
+    @push('css')
+        <link rel="stylesheet" href="{{ asset('css/nomina/botones.css') }}">
+    @endpush
+@if ($errors->any())
+    <div class="alert alert-danger alert-dismissible fade show shadow-sm">
+        <strong>⚠ Error:</strong>
+        <ul class="mb-0 mt-2">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
 
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
 <div class="container-fluid mt-4">
 
     {{-- 🔥 RESUMEN --}}
@@ -103,7 +117,7 @@
                         </td>
 
                         <td>
-                            @if($nomina->estado == 'Pagada')
+                            @if(strtolower(trim($nomina->estado)) === 'pagada')
                                 <span class="badge bg-success">Pagada</span>
                             @else
                                 <span class="badge bg-warning text-dark">Pendiente</span>
@@ -111,21 +125,46 @@
                         </td>
 
                         <td class="text-center">
-                            <div class="d-flex justify-content-center gap-2">
+                            <div class="acciones-nomina">
 
+                                {{-- VER --}}
                                 <a href="{{ route('nominas.show', $nomina->id) }}"
-                                class="btn btn-sm btn-primary rounded-pill">
-                                    Ver
+                                class="btn-accion btn-ver">
+                                    <i class="bi bi-eye"></i>
+                                    <span>Ver</span>
                                 </a>
 
-                                <button class="btn btn-sm btn-outline-success rounded-pill">
-                                    Detalle
-                                </button>
-
+                                {{-- PDF --}}
                                 <a href="{{ route('nominas.pdf', $nomina->id) }}"
-                                class="btn btn-sm btn-outline-secondary rounded-pill">
-                                    PDF
+                                class="btn-accion btn-pdf">
+                                    <i class="bi bi-file-earmark-pdf"></i>
+                                    <span>PDF</span>
                                 </a>
+
+                                {{-- PAGAR --}}
+                                @if(strtolower(trim($nomina->estado)) !== 'pagada')
+                                    <form action="{{ route('nominas.pagar', $nomina->id) }}" method="POST"
+                                        onsubmit="return confirm('¿Marcar como pagada?')">
+                                        @csrf
+                                        @method('PATCH')
+
+                                        <button class="btn-accion btn-pagar">
+                                            <i class="bi bi-check-circle"></i>
+                                            <span>Pagar</span>
+                                        </button>
+                                    </form>
+                                @else
+                                    <span class="estado-pill estado-pagada">
+                                        Pagada
+                                    </span>
+                                @endif
+
+                                <a href="{{ route('nominas.csv', $nomina->id) }}" class="btn-accion btn-csv">
+                                    <i class="bi bi-download"></i>
+                                    <span>CSV</span>
+                                </a>
+
+
 
                             </div>
                         </td>
