@@ -40,7 +40,7 @@ Haga click en la imagen para agregar foto
 {{-- Nombre --}}
 <div class="col-12 mb-3 text-start">
 <label class="form-label">Nombre</label>
-<input type="text" name="nombre" class="form-control" required>
+<input type="text" name="nombre" value="{{ old('inss')}}" class="form-control" required>
 </div>
 
 {{-- NUMERO EMPLEADO --}}
@@ -114,7 +114,13 @@ Haga click en la imagen para agregar foto
 {{-- INSS --}}
 <div class="col-md-6 mb-3 text-start">
 <label class="form-label">INSS</label>
-<input type="text" name="inss" class="form-control">
+
+<input type="text" name="inss" value="{{ old('inss')}}" class="form-control @error('inss') is-invalid @enderror">
+    @error('inss')
+        <div class="invalid-feedback">
+            {{ $message }}
+        </div>
+    @enderror
 </div>
 
 {{-- Cuenta bancaria --}}
@@ -180,3 +186,11 @@ Crear empleado
 </div>
 
 </form>
+
+@if($errors->any())
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    new bootstrap.Modal(document.getElementById('modalNuevoEmpleado')).show();
+});
+</script>
+@endif

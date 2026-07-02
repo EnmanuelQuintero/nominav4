@@ -213,27 +213,43 @@ function guardarDia(){
 /* =========================================================
    📌 FILTRAR CARGOS POR ÁREA
 ========================================================= */
-function filtrarCargos(){
+function filtrarCargos() {
 
-    let area = document.getElementById("areaSelect").value
-    let cargoSelect = document.getElementById("cargoSelect")
+    let area = document.getElementById("areaSelect").value;
+    let cargoSelect = document.getElementById("cargoSelect");
+    let opcionInicial = cargoSelect.querySelector("option[value='']");
 
-    cargoSelect.value = ""
+    cargoSelect.value = "";
 
-    if(!area){
-        cargoSelect.disabled = true
-        return
+    if (!area) {
+        cargoSelect.disabled = true;
+        opcionInicial.textContent = "Seleccione un área primero";
+        return;
     }
 
-    cargoSelect.disabled = false
+    let hayCargos = false;
 
     cargoSelect.querySelectorAll("option").forEach(cargo => {
-        if(!cargo.value) return
-        cargo.style.display = (cargo.dataset.area == area) ? "block" : "none"
-    })
+        if (!cargo.value) return;
+
+        if (cargo.dataset.area == area) {
+            cargo.style.display = "";
+            hayCargos = true;
+        } else {
+            cargo.style.display = "none";
+        }
+    });
+
+    if (hayCargos) {
+        cargoSelect.disabled = false;
+        opcionInicial.textContent = "Seleccione un cargo";
+    } else {
+        cargoSelect.disabled = true;
+        opcionInicial.textContent = "No hay cargos disponibles";
+    }
 }
 
-
+@endif
 </script>
     @pushOnce('scripts')
         <script src="{{ asset('js/empleado/editEmpleado.js') }}"></script>

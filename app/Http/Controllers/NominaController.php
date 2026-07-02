@@ -222,95 +222,95 @@ class NominaController extends Controller
     }
 
 
-public function store(Request $request)
-{
-    $request->validate([
-        'fecha_inicio' => 'required|date',
-        'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
-        'detalles' => 'required|json'
-    ]);
+    public function store(Request $request)
+    {
+        $request->validate([
+            'fecha_inicio' => 'required|date',
+            'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
+            'detalles' => 'required|json'
+        ]);
 
-    $fechaInicio = $request->fecha_inicio;
-    $fechaFin = $request->fecha_fin;
-    $detalles = json_decode($request->detalles, true);
+        $fechaInicio = $request->fecha_inicio;
+        $fechaFin = $request->fecha_fin;
+        $detalles = json_decode($request->detalles, true);
 
-    $totalDevengado = 0;
-    $totalDeducciones = 0;
-    $totalNeto = 0;
-    $costoEmpresa = 0;
+        $totalDevengado = 0;
+        $totalDeducciones = 0;
+        $totalNeto = 0;
+        $costoEmpresa = 0;
 
-    // 🔥 CALCULAR TOTALES PRIMERO
-    foreach ($detalles as $area => $empleados) {
-        foreach ($empleados as $emp) {
-            $totalDevengado += $emp['devengado'];
-            $totalDeducciones += $emp['deduccion'];
-            $totalNeto += $emp['neto'];
-            $costoEmpresa += $emp['inatec'] + $emp['inss_patronal'];
+        // 🔥 CALCULAR TOTALES PRIMERO
+        foreach ($detalles as $area => $empleados) {
+            foreach ($empleados as $emp) {
+                $totalDevengado += $emp['devengado'];
+                $totalDeducciones += $emp['deduccion'];
+                $totalNeto += $emp['neto'];
+                $costoEmpresa += $emp['inatec'] + $emp['inss_patronal'];
+            }
         }
+
+        // 🔥 GENERAR CODIGO (ej: NOM-2026-03-001)
+        $contador = Nomina::count() + 1;
+        $codigo = 'NOM-' . now()->format('Y-m') . '-' . str_pad($contador, 3, '0', STR_PAD_LEFT);
+
+        // 🔥 CREAR NOMINA YA CON DATOS REALES
+        $nomina = Nomina::create([
+            'codigo' => $codigo,
+            'fecha_inicio' => $fechaInicio,
+            'fecha_fin' => $fechaFin,
+            'total_devengado' => $totalDevengado,
+            'total_deducciones' => $totalDeducciones,
+            'total_neto' => $totalNeto,
+            'total_empresa' => $costoEmpresa,
+            'estado' => 'Pendiente'
+        ]);
+
+        // 🔥 GUARDAR DETALLES
+        foreach ($detalles as $area => $empleados) {
+            foreach ($empleados as $emp) {
+                NominaDetalle::create([
+                    'nomina_id' => $nomina->id,
+                    'empleado_id' => $emp['id'],
+                    'area' => $area,
+                    'numero_empleado' => $emp['numero'],
+                    'nombre' => $emp['nombre'],
+                    'cargo' => $emp['cargo'],
+                    'inss' => $emp['inss'] ?? 0,
+                    'salario_mensual' => $emp['salario_mensual'],
+                    'salario_diario' => $emp['salario_diario'],
+                    'salario_quincenal' => $emp['salario_quincenal'],
+                    'dias_trabajados' => $emp['dias_trabajados'],
+                    'horas_extra_cantidad' => $emp['horas_extra'],
+                    'horas_extra_monto' => $emp['monto_horas'],
+                    'dias_subsidio' => $emp['dias_subsidio'],
+                    'subsidio_monto' => $emp['subsidio'],
+                    'feriado' => $emp['feriado'],
+                    'total_devengado' => $emp['devengado'],
+                    'detalle_inss' => $emp['inss_deduccion'],
+                    'detalle_ir' => $emp['ir'],
+                    'total_deduccion' => $emp['deduccion'],
+                    'neto_pagar' => $emp['neto'],
+                    'detalle_inatec' => $emp['inatec'],
+                    'detalle_inss_patronal' => $emp['inss_patronal'],
+                ]);
+            }
+        }
+
+        return redirect()->route('nominas.index')
+                        ->with('success','Nómina guardada correctamente');
     }
 
-    // 🔥 GENERAR CODIGO (ej: NOM-2026-03-001)
-    $contador = Nomina::count() + 1;
-    $codigo = 'NOM-' . now()->format('Y-m') . '-' . str_pad($contador, 3, '0', STR_PAD_LEFT);
+    public function show($id)
+    {
+        $nomina = Nomina::with('detalles')->findOrFail($id);
 
-    // 🔥 CREAR NOMINA YA CON DATOS REALES
-    $nomina = Nomina::create([
-        'codigo' => $codigo,
-        'fecha_inicio' => $fechaInicio,
-        'fecha_fin' => $fechaFin,
-        'total_devengado' => $totalDevengado,
-        'total_deducciones' => $totalDeducciones,
-        'total_neto' => $totalNeto,
-        'total_empresa' => $costoEmpresa,
-        'estado' => 'Pendiente'
-    ]);
+        // 🔥 Agrupar por área (si no guardaste área, usamos cargo como fallback)
+        $detallesAgrupados = $nomina->detalles->groupBy(function($item){
+            return $item->area ?? 'Sin área';
+        });
 
-    // 🔥 GUARDAR DETALLES
-    foreach ($detalles as $area => $empleados) {
-        foreach ($empleados as $emp) {
-            NominaDetalle::create([
-                'nomina_id' => $nomina->id,
-                'empleado_id' => $emp['id'],
-                'area' => $area,
-                'numero_empleado' => $emp['numero'],
-                'nombre' => $emp['nombre'],
-                'cargo' => $emp['cargo'],
-                'inss' => $emp['inss'] ?? 0,
-                'salario_mensual' => $emp['salario_mensual'],
-                'salario_diario' => $emp['salario_diario'],
-                'salario_quincenal' => $emp['salario_quincenal'],
-                'dias_trabajados' => $emp['dias_trabajados'],
-                'horas_extra_cantidad' => $emp['horas_extra'],
-                'horas_extra_monto' => $emp['monto_horas'],
-                'dias_subsidio' => $emp['dias_subsidio'],
-                'subsidio_monto' => $emp['subsidio'],
-                'feriado' => $emp['feriado'],
-                'total_devengado' => $emp['devengado'],
-                'detalle_inss' => $emp['inss_deduccion'],
-                'detalle_ir' => $emp['ir'],
-                'total_deduccion' => $emp['deduccion'],
-                'neto_pagar' => $emp['neto'],
-                'detalle_inatec' => $emp['inatec'],
-                'detalle_inss_patronal' => $emp['inss_patronal'],
-            ]);
-        }
+        return view('nominas.show', compact('nomina','detallesAgrupados'));
     }
-
-    return redirect()->route('nominas.index')
-                     ->with('success','Nómina guardada correctamente');
-}
-
-public function show($id)
-{
-    $nomina = Nomina::with('detalles')->findOrFail($id);
-
-    // 🔥 Agrupar por área (si no guardaste área, usamos cargo como fallback)
-    $detallesAgrupados = $nomina->detalles->groupBy(function($item){
-        return $item->area ?? 'Sin área';
-    });
-
-    return view('nominas.show', compact('nomina','detallesAgrupados'));
-}
 
     public function pagar($id)
     {

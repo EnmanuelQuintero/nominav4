@@ -21,6 +21,7 @@ return new class extends Migration
             $table->enum('tipo', [
                 'trabajado',
                 'vacaciones',
+                'feriado',
                 'compensado',
                 'subsidio',
                 'no_trabajado'

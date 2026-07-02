@@ -26,29 +26,85 @@ class EmpleadoController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'numero_empleado' => 'required|string|max:50|unique:empleados,numero_empleado',
             'nombre' => 'required|string|max:255',
-            'cedula' => 'required|unique:empleados,cedula',
+            'numero_empleado' => 'required|string|max:50',
+            'cedula' => 'required|string|max:25',
+            'correo' => 'required|email|max:255',
+            'telefono' => 'required|string|max:20',
+            'area_id' => 'required|exists:areas,id',
             'cargo_id' => 'required|exists:cargos,id',
-            'salario' => 'required|numeric',
+            'inss' => 'required|string|max:50',
+            'cuenta_bancaria' => 'required|string|max:100',
+            'salario' => 'required|numeric|min:0',
             'fecha_inicio' => 'required|date',
-            'foto' => 'nullable|image|mimes:jpg,png,jpeg|max:2048'
-        ]);
+            'estado' => 'required|in:Activo,Subsidio,Renuncia,Despedido',
+            'fecha_finalizacion' => 'nullable|date',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ], [
+            // Nombre
+            'nombre.required' => 'Debe ingresar el nombre del empleado.',
+            'nombre.max' => 'El nombre no puede superar los 255 caracteres.',
 
-        // 🔥 GENERAR NÚMERO DE EMPLEADO AUTOMÁTICO
-        $numeroEmpleado = 'EMP-' . str_pad(Empleado::count() + 1, 5, '0', STR_PAD_LEFT);
+            // Número de empleado
+            'numero_empleado.required' => 'Debe ingresar el número de empleado.',
+            'numero_empleado.max' => 'El número de empleado es demasiado largo.',
+
+            // Cédula
+            'cedula.required' => 'Debe ingresar la cédula.',
+            'cedula.max' => 'La cédula es demasiado larga.',
+
+            // Correo
+            'correo.required' => 'Debe ingresar el correo electrónico.',
+            'correo.email' => 'Debe ingresar un correo electrónico válido.',
+            'correo.max' => 'El correo electrónico es demasiado largo.',
+
+            // Teléfono
+            'telefono.required' => 'Debe ingresar el teléfono.',
+            'telefono.max' => 'El teléfono es demasiado largo.',
+
+            // Área
+            'area_id.required' => 'Debe seleccionar un área.',
+            'area_id.exists' => 'El área seleccionada no es válida.',
+
+            // Cargo
+            'cargo_id.required' => 'Debe seleccionar un cargo.',
+            'cargo_id.exists' => 'El cargo seleccionado no es válido.',
+
+            // INSS
+            'inss.required' => 'Debe ingresar el número de INSS.',
+            'inss.max' => 'El número de INSS es demasiado largo.',
+
+            // Cuenta bancaria
+            'cuenta_bancaria.required' => 'Debe ingresar la cuenta bancaria.',
+            'cuenta_bancaria.max' => 'La cuenta bancaria es demasiado larga.',
+
+            // Salario
+            'salario.required' => 'Debe ingresar el salario.',
+            'salario.numeric' => 'El salario debe ser un valor numérico.',
+            'salario.min' => 'El salario no puede ser menor que cero.',
+
+            // Fecha inicio
+            'fecha_inicio.required' => 'Debe seleccionar la fecha de inicio.',
+            'fecha_inicio.date' => 'La fecha de inicio no es válida.',
+
+            // Estado
+            'estado.required' => 'Debe seleccionar el estado.',
+            'estado.in' => 'El estado seleccionado no es válido.',
+
+            // Fecha finalización
+            'fecha_finalizacion.date' => 'La fecha de finalización no es válida.',
+
+            // Foto
+            'foto.image' => 'El archivo debe ser una imagen.',
+            'foto.mimes' => 'La foto debe ser JPG, JPEG o PNG.',
+            'foto.max' => 'La foto no puede superar los 2 MB.',
+        ]);
 
         // 📸 FOTO
         $rutaFoto = null;
+
         if ($request->hasFile('foto')) {
             $rutaFoto = $request->file('foto')->store('empleados', 'public');
-        }
-
-        // 📅 LÓGICA DE FECHA FINAL
-        $fechaFinal = null;
-
-        if (in_array($request->estado, ['Despedido','Renuncia'])) {
-            $fechaFinal = $request->fecha_finalizacion ?? now();
         }
 
         Empleado::create([
@@ -64,13 +120,12 @@ class EmpleadoController extends Controller
             'salario' => $request->salario,
             'fecha_inicio' => $request->fecha_inicio,
             'estado' => $request->estado,
-            'fecha_finalizacion' => null // SIEMPRE NULL AL CREAR
+            'fecha_finalizacion' => null
         ]);
 
-        return back()->with('success','Empleado creado correctamente');
+        return back()->with('success', 'Empleado creado correctamente.');
     }
-
-
+    
     // ============================
     // 🔹 ACTUALIZAR EMPLEADO
     // ============================
