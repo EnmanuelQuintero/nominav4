@@ -28,12 +28,12 @@ class EmpleadoController extends Controller
         $request->validate([
             'nombre' => 'required|string|max:255',
             'numero_empleado' => 'required|string|max:50',
-            'cedula' => 'required|string|max:25',
+            'cedula' => 'required|string|max:25|unique:empleados,cedula',
             'correo' => 'required|email|max:255',
             'telefono' => 'required|string|max:20',
             'area_id' => 'required|exists:areas,id',
             'cargo_id' => 'required|exists:cargos,id',
-            'inss' => 'required|string|max:50',
+            'inss' => 'nullable|string|max:50',
             'cuenta_bancaria' => 'required|string|max:100',
             'salario' => 'required|numeric|min:0',
             'fecha_inicio' => 'required|date',
@@ -52,6 +52,7 @@ class EmpleadoController extends Controller
             // Cédula
             'cedula.required' => 'Debe ingresar la cédula.',
             'cedula.max' => 'La cédula es demasiado larga.',
+            'cedula.unique' => 'La cédula ya se encuentra registrada.',
 
             // Correo
             'correo.required' => 'Debe ingresar el correo electrónico.',
@@ -73,6 +74,7 @@ class EmpleadoController extends Controller
             // INSS
             'inss.required' => 'Debe ingresar el número de INSS.',
             'inss.max' => 'El número de INSS es demasiado largo.',
+            'inss.unique' => 'El número de INSS ya se encuentra registrado.',
 
             // Cuenta bancaria
             'cuenta_bancaria.required' => 'Debe ingresar la cuenta bancaria.',

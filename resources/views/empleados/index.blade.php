@@ -247,9 +247,9 @@ function filtrarCargos() {
         cargoSelect.disabled = true;
         opcionInicial.textContent = "No hay cargos disponibles";
     }
-}
+}   
 
-@endif
+
 </script>
     @pushOnce('scripts')
         <script src="{{ asset('js/empleado/editEmpleado.js') }}"></script>

@@ -1,6 +1,18 @@
 @extends('layouts.app')
 
 @section('content')
+
+@if($nominaExistente)
+    <div class="alert alert-warning border-start border-5 border-warning shadow-sm">
+        <strong>Atención:</strong>
+
+        Ya existe una nómina registrada para este período
+        ({{ $nominaExistente->codigo }}).
+
+        Si continúa, los datos existentes serán reemplazados por los de esta previsualización.
+    </div>
+@endif
+
     @push('css')
         <link rel="stylesheet" href="{{ asset('css/nomina/tabla.css') }}">
     @endpush
@@ -45,15 +57,24 @@
         <h5 class="fw-bold">Listado de Nóminas</h5>
 
         {{-- 🔥 BOTÓN GUARDAR NÓMINA --}}
-        <form action="{{ route('nominas.store') }}" method="POST">
+        <form action="{{ route('nominas.store') }}" method="POST"  onsubmit="this.querySelector('button[type=submit]').disabled=true;">
             @csrf
+
             <input type="hidden" name="detalles" value='@json($detallesAgrupados)'>
             <input type="hidden" name="fecha_inicio" value="{{ $fechaInicio }}">
             <input type="hidden" name="fecha_fin" value="{{ $fechaFin }}">
 
-            <button type="submit" class="btn btn-success rounded-pill shadow-sm">
-                💾 Guardar Nómina
-            </button>
+            @if($nominaExistente)
+                <input type="hidden" name="actualizar" value="1">
+                <input type="hidden" name="nomina_id" value="{{ $nominaExistente->id }}">
+            @endif
+
+        <button
+            type="submit"
+            class="btn {{ $nominaExistente ? 'btn-warning' : 'btn-success' }} rounded-pill shadow-sm">
+            {{ $nominaExistente ? 'Actualizar Nómina' : 'Guardar Nómina' }}
+        </button>
+
         </form>
 
     </div>
