@@ -37,17 +37,96 @@ class ReporteController extends Controller
 
     public function generarSolvencias(Request $request)
     {
-        $ids = $request->empleados;
+        $request->validate([
+            'nomina_id' => 'required',
+            'tipo' => 'required'
+        ]);
 
-        if (!$ids || count($ids) === 0) {
-            return response()->json(['error' => 'Sin empleados'], 400);
+        $query = NominaDetalle::where(
+            'nomina_id',
+            $request->nomina_id
+        );
+
+        if(
+            $request->tipo == 'area'
+            && $request->filled('area')
+        ) {
+
+            $query->where(
+                'area',
+                $request->area
+            );
         }
 
-        $detalles = NominaDetalle::whereIn('id', $ids)->get();
+        if(
+            $request->tipo == 'empleado'
+            && $request->filled('empleados')
+        ) {
 
-        $pdf = Pdf::loadView('reportes.solvencias-pdf', compact('detalles'))
-                ->setPaper('letter', 'portrait');
+            $query->whereIn(
+                'empleado_id',
+                $request->empleados
+            );
 
-        return $pdf->download('solvencias.pdf');
+        }
+
+        $detalles = $query
+        ->with('deducciones')
+        ->get();
+
+        if($detalles->isEmpty()) {
+
+            return response()->json([
+                'error' => 'No se encontraron registros'
+            ], 404);
+
+        }
+
+        $pdf = Pdf::loadView(
+            'reportes.solvencias-pdf',
+            compact('detalles')
+        )->setPaper(
+            'letter',
+            'portrait'
+        );
+
+
+        //dd($request->all());
+return $pdf->stream('solvencias.pdf');
+
+
+    }
+
+        public function obtenerFiltrosNomina($nominaId)
+    {
+        $detalles = NominaDetalle::where(
+            'nomina_id',
+            $nominaId
+        )->get();
+
+        $areas = $detalles
+            ->pluck('area')
+            ->unique()
+            ->sort()
+            ->values();
+
+        $empleados = $detalles
+            ->map(function ($item) {
+
+                return [
+                    'empleado_id' => $item->empleado_id,
+                    'nombre' => $item->nombre,
+                    'cargo' => $item->cargo,
+                    'numero' => $item->numero_empleado,
+                ];
+
+            })
+            ->unique('empleado_id')
+            ->values();
+
+        return response()->json([
+            'areas' => $areas,
+            'empleados' => $empleados
+        ]);
     }
 }

@@ -56,7 +56,12 @@
                Reportes
             </a>
         </li>
-
+        <li class="nav-item">
+            <a href="{{ route('deducciones.index') }}" class="nav-link text-white">
+               <i class="bi bi-bar-chart me-2"></i>
+              deducciones
+            </a>
+        </li>
     </ul>
 
     {{-- CONFIGURACIONES --}}

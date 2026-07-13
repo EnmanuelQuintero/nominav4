@@ -9,6 +9,7 @@ use App\Models\ParametroNomina;
 use App\Models\HoraExtra;
 use App\Models\EmpleadoDia;
 use App\Models\TablaIR;
+use App\Models\NominaDetalleDeduccion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -56,9 +57,12 @@ public function preview(Request $request)
             'fecha_fin', '>=', $fechaInicio
         )
         ->first();
-        
+
     // 🔥 EMPLEADOS ACTIVOS
-    $empleados = Empleado::with('cargo.area')
+    $empleados = Empleado::with([
+            'cargo.area',
+            'deducciones'
+        ])
         ->where('estado', 'Activo')
         ->get();
 
@@ -67,12 +71,13 @@ public function preview(Request $request)
     $tablaIR = TablaIr::orderBy('desde')->get();
 
     $detalles = [];
-    $resumen = [
-        'devengado' => 0,
-        'deducciones' => 0,
-        'neto' => 0,
-        'empresa' => 0,
-    ];
+$resumen = [
+    'devengado' => 0,
+    'deducciones' => 0,
+    'otras' => 0,
+    'neto' => 0,
+    'empresa' => 0,
+];
 
     foreach ($empleados as $emp) {
 
@@ -116,7 +121,7 @@ public function preview(Request $request)
         $baseIRMensual = $baseIRMensual * 12;
 
         $irMensual = 0;
-
+        $irCentavos = 0;
         foreach ($tablaIR as $tramo) {
 
             if (
@@ -148,8 +153,56 @@ public function preview(Request $request)
         // Convertir a córdobas solamente al final
         $ir = $irCentavos / 100;
 
-        // Total deducción y neto
-        $deduccion = $inss + $ir;
+        // =================================
+        // OTRAS DEDUCCIONES
+        // =================================
+
+        $otrasDeducciones = [];
+        $totalOtrasDeducciones = 0;
+
+
+        foreach($emp->deducciones as $deduccionEmpleado)
+        {
+
+            if($deduccionEmpleado->tipo == 'monto')
+            {
+                $monto = $deduccionEmpleado->valor;
+            }
+            else
+            {
+                $monto = $devengado *
+                    ($deduccionEmpleado->valor / 100);
+            }
+
+
+            $otrasDeducciones[] = [
+
+                'id' => $deduccionEmpleado->id,
+
+                'nombre' => $deduccionEmpleado->nombre,
+
+                'tipo' => $deduccionEmpleado->tipo,
+
+                'valor' => $deduccionEmpleado->valor,
+
+                'monto' => $monto
+
+            ];
+
+
+            $totalOtrasDeducciones += $monto;
+
+        }
+
+        // Total deducciones
+        $deduccion = 
+            $inss +
+            $ir +
+            $totalOtrasDeducciones;
+
+
+
+        // Neto
         $neto = $devengado - $deduccion;
 
         // 🏢 APORTES EMPRESA
@@ -179,6 +232,9 @@ public function preview(Request $request)
 
             'inss_deduccion' => $inss,
             'ir' => $ir,
+            'otras_deducciones' => $totalOtrasDeducciones,
+            'detalle_otras_deducciones' => $otrasDeducciones,
+
             'deduccion' => $deduccion,
 
             'neto' => $neto,
@@ -189,6 +245,7 @@ public function preview(Request $request)
 
         $resumen['devengado'] += $devengado;
         $resumen['deducciones'] += $deduccion;
+        $resumen['otras'] += $totalOtrasDeducciones;
         $resumen['neto'] += $neto;
         $resumen['empresa'] += ($inatec + $inssPatronal);
     }
@@ -282,46 +339,103 @@ public function preview(Request $request)
             'fecha_fin' => $request->fecha_fin,
         ]);
         // 🔥 GUARDAR DETALLES
+        // 🔥 GUARDAR DETALLES
         foreach ($detalles as $area => $empleados) {
 
             foreach ($empleados as $emp) {
 
-                NominaDetalle::create([
-                'nomina_id' => $nomina->id,
-                'empleado_id' => $emp['id'],
-                'area' => $area,
-                'numero_empleado' => $emp['numero'],
-                'nombre' => $emp['nombre'],
-                'cargo' => $emp['cargo'],
-                'inss' => $emp['inss'] ?? 0,
 
-                'salario_mensual' => $emp['salario_mensual'],
-                'salario_diario' => $emp['salario_diario'],
-                'salario_quincenal' => $emp['salario_quincenal'],
+                // Crear detalle del empleado
+                $nominaDetalle = NominaDetalle::create([
 
-                'dias_trabajados' => $emp['dias_trabajados'],
+                    'nomina_id' => $nomina->id,
 
-                'horas_extra_cantidad' => $emp['horas_extra'],
-                'horas_extra_monto' => $emp['monto_horas'],
+                    'empleado_id' => $emp['id'],
 
-                'dias_subsidio' => $emp['dias_subsidio'],
-                'subsidio_monto' => $emp['subsidio'],
+                    'area' => $area,
 
-                'feriado' => $emp['feriado'],
+                    'numero_empleado' => $emp['numero'],
+                    'nombre' => $emp['nombre'],
+                    'cargo' => $emp['cargo'],
+                    'inss' => $emp['inss'] ?? 0,
 
-                'total_devengado' => $emp['devengado'],
 
-                'detalle_inss' => $emp['inss_deduccion'],
-                'detalle_ir' => $emp['ir'],
-                'total_deduccion' => $emp['deduccion'],
+                    'salario_mensual' => $emp['salario_mensual'],
+                    'salario_diario' => $emp['salario_diario'],
+                    'salario_quincenal' => $emp['salario_quincenal'],
 
-                'neto_pagar' => $emp['neto'],
 
-                'detalle_inatec' => $emp['inatec'],
-                'detalle_inss_patronal' => $emp['inss_patronal'],
-            ]);
+                    'dias_trabajados' => $emp['dias_trabajados'],
+
+
+                    'horas_extra_cantidad' => $emp['horas_extra'],
+                    'horas_extra_monto' => $emp['monto_horas'],
+
+
+                    'dias_subsidio' => $emp['dias_subsidio'],
+                    'subsidio_monto' => $emp['subsidio'],
+
+
+                    'feriado' => $emp['feriado'],
+
+
+                    'total_devengado' => $emp['devengado'],
+
+
+                    // DEDUCCIONES
+                    'detalle_inss' => $emp['inss_deduccion'],
+                    'detalle_ir' => $emp['ir'],
+
+                    // NUEVO
+                    'otras_deducciones' => $emp['otras_deducciones'] ?? 0,
+
+                    'total_deduccion' => $emp['deduccion'],
+
+
+                    'neto_pagar' => $emp['neto'],
+
+
+                    // APORTES
+                    'detalle_inatec' => $emp['inatec'],
+                    'detalle_inss_patronal' => $emp['inss_patronal'],
+
+                ]);
+
+
+
+                // =====================================
+                // GUARDAR DETALLE DE OTRAS DEDUCCIONES
+                // =====================================
+
+                if(isset($emp['detalle_otras_deducciones'])) {
+
+
+                    foreach($emp['detalle_otras_deducciones'] as $deduccion) {
+
+
+                        NominaDetalleDeduccion::create([
+
+                            'nomina_detalle_id' => $nominaDetalle->id,
+
+                            'deduccion_id' => $deduccion['id'],
+
+                            'nombre' => $deduccion['nombre'],
+
+                            'tipo' => $deduccion['tipo'] ?? 'monto',
+
+                            'valor' => $deduccion['valor'] ?? 0,
+
+                            'monto_aplicado' => $deduccion['monto'],
+
+                        ]);
+
+                    }
+
+                }
+
+            }
+
         }
-    }
 
     return redirect()
         ->route('nominas.index')

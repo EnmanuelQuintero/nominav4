@@ -1,111 +1,206 @@
-document.addEventListener("DOMContentLoaded", function(){
 
-    const select = document.getElementById("selectNomina");
 
-    if(select){
-        select.addEventListener("change", function(){
+// MOSTRAR U OCULTAR FILTROS
 
-            let id = this.value
+document
+.getElementById('tipoReporte')
+.addEventListener('change', function () {
 
-            if(!id) return
+    document
+        .getElementById('contenedorArea')
+        .classList.add('d-none');
 
-            fetch(`/reportes/nomina/${id}`)
-                .then(res => res.json())
-                .then(data => renderEmpleados(data))
-        })
+    document
+        .getElementById('contenedorEmpleado')
+        .classList.add('d-none');
+
+    if(this.value === 'area')
+    {
+        document
+            .getElementById('contenedorArea')
+            .classList.remove('d-none');
+    }
+
+    if(this.value === 'empleado')
+    {
+        document
+            .getElementById('contenedorEmpleado')
+            .classList.remove('d-none');
     }
 
 });
 
-function renderEmpleados(data){
 
-    let cont = document.getElementById("listaEmpleados")
-    cont.innerHTML = ''
+// FILTRAR NOMINAS POR AÑO Y MES
 
-    Object.keys(data).forEach(area => {
+function filtrarNominas()
+{
+    let anio = document.getElementById('anio').value;
+    let mes = document.getElementById('mes').value;
 
-        let html = `
-            <div class="mb-3">
+    let opciones =
+        document.querySelectorAll('#selectNomina option');
 
-                <div class="fw-bold mb-2">
-                    <input type="checkbox" onclick="toggleArea(this)">
-                    ${area}
-                </div>
-        `
+    opciones.forEach(op => {
 
-        data[area].forEach(emp => {
-            html += `
-                <div class="form-check ms-3">
-                    <input class="form-check-input empleado-check"
-                           type="checkbox"
-                           value="${emp.id}">
+        if(!op.value) return;
 
-                    <label class="form-check-label">
-                        ${emp.nombre} (${emp.cargo})
-                    </label>
-                </div>
-            `
-        })
+        let visible =
+            op.dataset.anio == anio &&
+            op.dataset.mes == mes;
 
-        html += `</div>`
+        op.hidden = !visible;
 
-        cont.innerHTML += html
-    })
+    });
+
+    document.getElementById('selectNomina').value = '';
 }
 
-function seleccionarTodos(){
-    document.querySelectorAll(".empleado-check")
-        .forEach(e => e.checked = true)
-}
+document
+.getElementById('anio')
+.addEventListener('change', filtrarNominas);
 
-function limpiarSeleccion(){
-    document.querySelectorAll(".empleado-check")
-        .forEach(e => e.checked = false)
-}
+document
+.getElementById('mes')
+.addEventListener('change', filtrarNominas);
 
-function toggleArea(el){
-    let container = el.closest('.mb-3')
-    container.querySelectorAll(".empleado-check")
-        .forEach(e => e.checked = el.checked)
-}
+document
+.getElementById('selectNomina')
+.addEventListener('change', function () {
 
-function generarSolvencias(){
+    let nominaId = this.value;
 
-    let ids = []
-
-    document.querySelectorAll(".empleado-check:checked")
-        .forEach(e => ids.push(e.value))
-
-    if(ids.length === 0){
-        return alert("Seleccione al menos un empleado")
+    if(!nominaId)
+    {
+        return;
     }
 
-    fetch('/reportes/solvencias', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-        },
-        body: JSON.stringify({ empleados: ids })
-    })
-    .then(res => {
-        if(!res.ok){
-            throw new Error("Error en la petición")
-        }
-        return res.blob()
-    })
-    .then(blob => {
+    fetch(`/reportes/nomina/${nominaId}/filtros`)
+    .then(response => response.json())
+    .then(data => {
 
-        const url = window.URL.createObjectURL(blob)
-        const a = document.createElement('a')
+        cargarAreas(data.areas);
 
-        a.href = url
-        a.download = 'solvencias.pdf'
-        a.click()
+        cargarEmpleados(data.empleados);
 
-    })
-    .catch(err => {
-        console.error(err)
-        alert("Error generando el PDF")
-    })
+    });
+
+});
+
+
+function cargarAreas(areas)
+{
+    let select =
+        document.getElementById('area');
+
+    select.innerHTML =
+        '<option value="">Seleccione área</option>';
+
+    areas.forEach(area => {
+
+        select.innerHTML += `
+            <option value="${area}">
+                ${area}
+            </option>
+        `;
+
+    });
+}
+
+
+function cargarEmpleados(empleados)
+{
+    let contenedor =
+        document.getElementById('empleado');
+
+    contenedor.innerHTML = '';
+
+    empleados.forEach(emp => {
+
+        contenedor.innerHTML += `
+
+            <div class="form-check mb-2">
+
+                <input 
+                    class="form-check-input empleado-check"
+                    type="checkbox"
+                    value="${emp.empleado_id}"
+                    id="emp_${emp.empleado_id}"
+                >
+
+                <label 
+                    class="form-check-label"
+                    for="emp_${emp.empleado_id}">
+                    
+                    ${emp.numero} - ${emp.nombre}
+                    <small class="text-muted">
+                        (${emp.cargo})
+                    </small>
+
+                </label>
+
+            </div>
+
+        `;
+
+    });
+}
+
+function generarSolvencias()
+{
+    let nomina_id =
+        document.getElementById('selectNomina').value;
+
+    let tipo =
+        document.getElementById('tipoReporte').value;
+
+    let area =
+        document.getElementById('area').value;
+
+    let empleados = [];
+
+    document
+    .querySelectorAll('.empleado-check:checked')
+    .forEach(chk => {
+
+        empleados.push(chk.value);
+
+    });
+
+    if(!nomina_id)
+    {
+        alert('Seleccione una nómina');
+        return;
+    }
+
+    let token = document
+        .querySelector('meta[name="csrf-token"]')
+        .getAttribute('content');
+
+    let form = document.createElement('form');
+
+    form.method = 'POST';
+    form.action = '/reportes/solvencias';
+
+
+    form.innerHTML = `
+        <input type="hidden" name="_token" value="${token}">
+        <input type="hidden" name="nomina_id" value="${nomina_id}">
+        <input type="hidden" name="tipo" value="${tipo}">
+        <input type="hidden" name="area" value="${area}">
+        ${empleados.map(id => 
+        `
+        <input 
+        type="hidden" 
+        name="empleados[]" 
+        value="${id}">
+        `
+        ).join('')}
+    `;
+
+    document.body.appendChild(form);
+
+    form.submit();
+
+    document.body.removeChild(form);
 }

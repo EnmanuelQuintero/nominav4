@@ -69,4 +69,7 @@ class NominaExportController extends Controller
         return $pdf->download('comprobante_'.$detalle->numero_empleado.'.pdf');
     }
 
+
+
+
 }

@@ -7,6 +7,7 @@ use App\Models\Empleado;
 use App\Models\Cargo;
 use App\Models\Area;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Deduccion;
 
 class EmpleadoController extends Controller
 {
@@ -19,7 +20,40 @@ class EmpleadoController extends Controller
 
         return view('empleados.index', compact('cargos','areas','empleados'));
     }
+    public function obtenerDeducciones(Empleado $empleado)
+    {
 
+        $deducciones = Deduccion::where('activa',true)
+            ->get();
+
+
+        $asignadas = $empleado->deducciones
+            ->pluck('id')
+            ->toArray();
+
+
+        return response()->json([
+            'empleado'=>$empleado->nombre,
+            'deducciones'=>$deducciones,
+            'asignadas'=>$asignadas
+        ]);
+
+    }
+
+    public function guardarDeducciones(Request $request, Empleado $empleado)
+    {
+
+        $empleado->deducciones()
+            ->sync($request->deducciones ?? []);
+
+
+        return back()
+            ->with(
+                'success',
+                'Deducciones actualizadas correctamente'
+            );
+
+    }
     // ============================
     // 🔹 CREAR EMPLEADO
     // ============================

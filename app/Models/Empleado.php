@@ -58,6 +58,21 @@ class Empleado extends Model
         );
     }
 
+
+    public function deducciones()
+    {
+        return $this->belongsToMany(
+            Deduccion::class,
+            'empleado_deduccion'
+        )
+        ->withPivot([
+            'activa',
+            'fecha_inicio',
+            'fecha_fin'
+        ])
+        ->withTimestamps();
+    }
+
     /*
     |--------------------------------------------------------------------------
     | ACCESSORS (BONITO PARA VISTAS)

@@ -121,6 +121,7 @@
                             {{-- DEDUCCIONES --}}
                             <th>INSS</th>
                             <th>IR</th>
+                            <th>Otras deducciones</th>
                             <th>Total</th>
 
                             {{-- NETO --}}
@@ -194,6 +195,9 @@
 
                             <td class="text-danger">
                                 C$ {{ number_format($emp['ir'],2) }}
+                            </td>
+                            <td class="text-danger">
+                                C$ {{ number_format($emp['otras_deducciones'],2) }}
                             </td>
 
                             <td class="fw-bold text-danger">

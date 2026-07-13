@@ -104,6 +104,13 @@
                                             data-bs-target="#modalDias">
                                         📅
                                     </button>
+                                    <button class="btn btn-sm btn-info"
+                                            onclick="abrirDeducciones({{ $empleado->id }}, '{{ $empleado->nombre }}')">
+
+                                        <i class="bi bi-cash"></i>
+                                        Deducciones
+
+                                    </button>
 
                                 </div>
 

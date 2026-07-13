@@ -45,7 +45,17 @@ Route::post('/empleados/dias', [EmpleadoDiaController::class, 'store'])
 // Obtener días por empleado
 Route::get('/empleados/dias/{id}', [EmpleadoDiaController::class, 'obtenerPorEmpleado'])
     ->name('empleados.dias.obtener');
+Route::get(
+    '/empleados/{empleado}/deducciones',
+    [EmpleadoController::class,'obtenerDeducciones']
+)
+->name('empleados.deducciones.obtener');
 
+Route::post(
+'/empleados/{empleado}/deducciones',
+[EmpleadoController::class,'guardarDeducciones']
+)
+->name('empleados.deducciones.guardar');
 
 use App\Http\Controllers\NominaController;
 
@@ -105,3 +115,25 @@ Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.ind
 Route::get('/reportes/nomina/{id}', [ReporteController::class, 'empleadosPorNomina']);
 
 Route::post('/reportes/solvencias', [ReporteController::class, 'generarSolvencias']);
+
+Route::get(
+    '/reportes/nomina/{nomina}/filtros',
+    [ReporteController::class, 'obtenerFiltrosNomina']
+)->name('reportes.filtros-nomina');
+
+
+
+use App\Http\Controllers\DeduccionController;
+
+Route::resource('deducciones', DeduccionController::class);
+
+
+Route::get('/prueba-pdf', function () {
+
+    $pdf = Pdf::loadHTML('
+        <h1>PDF DE PRUEBA</h1>
+        <p>DomPDF funciona correctamente.</p>
+    ');
+
+    return $pdf->download('prueba.pdf');
+});

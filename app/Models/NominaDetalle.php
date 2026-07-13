@@ -55,4 +55,15 @@ class NominaDetalle extends Model
     {
         return $this->belongsTo(Empleado::class);
     }
+
+    public function deducciones()
+    {
+        return $this->hasMany(
+            NominaDetalleDeduccion::class,
+            'nomina_detalle_id'
+        );
+    }
+
+
+
 }

@@ -34,7 +34,7 @@
 @include("empleados.components.diasTrabajados")
 @include("empleados.components.nuevoEmpleado")
 
-
+@include('empleados.components.deducciones')
 <button 
     class="btn btn-primary rounded-circle shadow position-fixed"
     style="bottom: 25px; right: 25px; width:60px; height:60px; font-size:28px; z-index:1050;"
@@ -45,6 +45,111 @@
 
 </button>
 
+
+
+
+<script>
+    function abrirDeducciones(id,nombre)
+{
+
+    document.getElementById(
+        'nombreEmpleadoDeduccion'
+    ).innerHTML = nombre;
+
+
+    fetch(`/empleados/${id}/deducciones`)
+    .then(res=>res.json())
+    .then(data=>{
+
+
+        let html='';
+
+
+        data.deducciones.forEach(d=>{
+
+
+            let checked =
+                data.asignadas.includes(d.id)
+                ? 'checked'
+                : '';
+
+
+
+            html += `
+
+            <div class="card mb-2">
+
+                <div class="card-body">
+
+
+                    <div class="form-check">
+
+                        <input 
+                        class="form-check-input"
+                        type="checkbox"
+                        name="deducciones[]"
+                        value="${d.id}"
+                        ${checked}>
+
+
+                        <label class="form-check-label fw-bold">
+
+                            ${d.nombre}
+
+                        </label>
+
+
+                    </div>
+
+
+                    <small class="text-muted">
+
+                    ${
+                    d.tipo=='porcentaje'
+                    ? d.valor+' %'
+                    : 'C$ '+d.valor
+                    }
+
+                    </small>
+
+
+                </div>
+
+            </div>
+
+
+            `;
+
+        });
+
+
+
+        document.getElementById(
+            'listaDeduccionesEmpleado'
+        ).innerHTML=html;
+
+
+
+        document.getElementById(
+            'formDeduccionesEmpleado'
+        ).action =
+        `/empleados/${id}/deducciones`;
+
+
+
+        let elemento = document.getElementById(
+            'offcanvasDeduccionesEmpleado'
+        );
+
+        let panel = new bootstrap.Offcanvas(elemento);
+
+        panel.show();
+
+
+    });
+
+}
+</script>
 
 <script>
 
