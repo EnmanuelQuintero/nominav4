@@ -36,10 +36,21 @@
                             <td>
                                 <div class="d-flex align-items-center gap-3">
 
-                                    <img src="{{ $empleado->foto 
-                                        ? asset('storage/'.$empleado->foto) 
-                                        : 'https://i.pravatar.cc/40' }}"
-                                        class="foto-tabla">
+                                @if(Str::startsWith($empleado->foto, 'images/'))
+                                    <img src="{{ asset($empleado->foto) }}"
+                                        alt="Foto"
+                                        class="rounded-circle"
+                                        width="80"
+                                        height="80"
+                                        style="object-fit: cover;">
+                                @else
+                                    <img src="{{ asset('storage/' . $empleado->foto) }}"
+                                        alt="Foto"
+                                        class="rounded-circle"
+                                        width="80"
+                                        height="80"
+                                        style="object-fit: cover;">
+                                @endif
 
                                     <div>
                                         <div class="fw-bold">

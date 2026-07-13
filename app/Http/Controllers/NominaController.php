@@ -132,7 +132,7 @@ class NominaController extends Controller
             $subsidio = $diasSubsidio * $salarioDiario;
             $feriado = 0;
 
-            $devengado = $salarioQuincenal + $montoHorasExtra + $subsidio + $feriado;
+            $devengado = ($diasTrabajados * $salarioDiario) + $montoHorasExtra + $subsidio + $feriado;
 
             // INSS laboral
             $inss = $devengado * ($parametros->porcentaje_inss_laboral / 100);

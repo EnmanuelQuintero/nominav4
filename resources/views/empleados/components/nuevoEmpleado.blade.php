@@ -39,7 +39,7 @@ Haga click en la imagen para agregar foto
 
 {{-- Nombre --}}
 <div class="col-12 mb-3 text-start">
-<label class="form-label">Nombre</label>
+<label class="form-label">Nombre Completo</label>
 <input type="text" name="nombre" class="form-control" required>
 </div>
 

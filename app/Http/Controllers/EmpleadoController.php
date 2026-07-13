@@ -40,8 +40,11 @@ class EmpleadoController extends Controller
 
         // 📸 FOTO
         $rutaFoto = null;
+        // FOTO
         if ($request->hasFile('foto')) {
             $rutaFoto = $request->file('foto')->store('empleados', 'public');
+        } else {
+            $rutaFoto = 'images/default-user.jpg'; // Ruta de la imagen por defecto
         }
 
         // 📅 LÓGICA DE FECHA FINAL
@@ -64,7 +67,7 @@ class EmpleadoController extends Controller
             'salario' => $request->salario,
             'fecha_inicio' => $request->fecha_inicio,
             'estado' => $request->estado,
-            'fecha_finalizacion' => null // SIEMPRE NULL AL CREAR
+            'fecha_finalizacion' => null
         ]);
 
         return back()->with('success','Empleado creado correctamente');
