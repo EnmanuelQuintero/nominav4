@@ -14,7 +14,42 @@
 
 
 <style>
-    
+:root {
+    --sidebar-width: 250px;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    max-width: 100%;
+    overflow-x: hidden;
+    width: 100%;
+}
+
+.sidebar {
+    bottom: 0;
+    left: 0;
+    overflow-y: auto;
+    position: fixed;
+    top: 0;
+    width: var(--sidebar-width);
+    z-index: 1050;
+}
+
+.main-content {
+    margin-left: var(--sidebar-width);
+    max-width: calc(100% - var(--sidebar-width));
+    min-height: 100vh;
+    min-width: 0;
+    overflow-x: hidden;
+    width: calc(100% - var(--sidebar-width));
+}
 /* FOTO */
 .foto-tabla {
     width: 45px;
@@ -412,10 +447,13 @@
 <div class="d-flex">
 
     {{-- SIDEBAR --}}
-    @include("layouts.components.sidebar")
+    <aside class="sidebar">
+        @include("layouts.components.sidebar")
+    </aside>
+    
 
     {{-- CONTENIDO --}}
-    <div class="flex-grow-1 p-4 bg-light">
+    <div class="flex-grow-1 p-4 bg-light main-content">
         @yield('content')
     </div>
 

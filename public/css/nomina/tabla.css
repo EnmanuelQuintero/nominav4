@@ -1,94 +1,384 @@
-
-.flex-grow-1 
-{
-    overflow: hidden; /* 🔥 clave */
-    max-width: calc(100vw - 250px); /* 🔥 respeta sidebar */
+:root {
+    --nomina-azul: #2563eb;
+    --nomina-verde: #059669;
+    --nomina-rojo: #dc2626;
+    --nomina-naranja: #d97706;
+    --nomina-morado: #7c3aed;
+    --nomina-gris: #64748b;
+    --nomina-borde: #e2e8f0;
+    --nomina-fondo: #f8fafc;
 }
-/* 🔥 SCROLL HORIZONTAL PRO */
-.tabla-nomina-scroll {
-    position: relative;
-    overflow: auto;
-    max-height: calc(90vh - 220px); /* 🔥 dinámico según pantalla */
+
+/* Página ubicada dentro del contenido que acompaña al sidebar */
+.nomina-page {
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
     width: 100%;
+}
+
+.nomina-page .row,
+.nomina-page .card,
+.nomina-page .card-body {
+    max-width: 100%;
+    min-width: 0;
+}
+
+.nomina-alerta {
+    border: 0;
+    border-left: 5px solid #f59e0b;
     border-radius: 12px;
-    background: #fff;
 }
 
-
-/* 🔥 EVITA QUE EL TEXTO SE BAJE */
-.tabla-nomina th,
-.tabla-nomina td {
-    white-space: nowrap;
-    font-size: 13px;
-    padding: 10px 14px;
+.alerta-icono {
+    align-items: center;
+    background: #f59e0b;
+    border-radius: 50%;
+    color: #fff;
+    display: flex;
+    flex: 0 0 32px;
+    font-size: 18px;
+    font-weight: 700;
+    height: 32px;
+    justify-content: center;
 }
 
-
-/* 🔥 HEADER FIJO (PRO) */
-.tabla-nomina thead th {
-
-    top: 0;
-    z-index: 2;
+.tarjeta-resumen {
+    border: 0;
+    border-radius: 14px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* 🔥 PRIMERAS COLUMNAS FIJAS (MUY PRO) */
-.tabla-nomina td:first-child,
-.tabla-nomina th:first-child {
-
+.tarjeta-resumen::before {
+    content: "";
+    height: 4px;
     left: 0;
-    background: transparent;
-    z-index: 2;
-    color: #000;
+    position: absolute;
+    right: 0;
+    top: 0;
 }
 
-.tabla-nomina td:nth-child(2),
-.tabla-nomina th:nth-child(2) {
-
-    
-    background: #fff;
-    z-index: 2;
+.tarjeta-resumen:hover {
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.1);
+    transform: translateY(-2px);
 }
 
-/* 🔥 EFECTO HOVER MÁS LIMPIO */
-.tabla-nomina tbody tr:hover {
-    background-color: #f5f7fa;
-    transition: 0.2s;
+.tarjeta-devengado::before {
+    background: var(--nomina-verde);
 }
 
-/* 🔥 SCROLL BONITO */
+.tarjeta-deducciones::before {
+    background: var(--nomina-rojo);
+}
+
+.tarjeta-neto::before {
+    background: var(--nomina-azul);
+}
+
+.tarjeta-empresa::before {
+    background: var(--nomina-naranja);
+}
+
+.tarjeta-empleados::before {
+    background: var(--nomina-morado);
+}
+
+.resumen-etiqueta {
+    color: var(--nomina-gris);
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    margin-bottom: 7px;
+    text-transform: uppercase;
+}
+
+.resumen-monto {
+    color: #0f172a;
+    font-size: 1.35rem;
+    font-weight: 750;
+    margin-bottom: 4px;
+    white-space: nowrap;
+}
+
+.tarjeta-resumen small {
+    color: #94a3b8;
+}
+
+/* La tarjeta no debe superar el espacio disponible */
+.nomina-card {
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    width: 100%;
+}
+
+/* Solo esta sección tendrá desplazamiento horizontal */
+.tabla-nomina-scroll {
+    display: block;
+    max-height: 68vh;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    position: relative;
+    width: 100%;
+}
+.buscador-nomina {
+    min-width: 310px;
+}
+
+.buscador-nomina .input-group-text,
+.buscador-nomina .form-control {
+    border-color: var(--nomina-borde);
+}
+
+.buscador-nomina .form-control:focus {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.1);
+}
+
+.tabla-nomina-scroll {
+    display: block;
+    max-height: 65vh;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: auto;
+    position: relative;
+    width: 100%;
+}
+
 .tabla-nomina-scroll::-webkit-scrollbar {
     height: 10px;
+    width: 10px;
+}
+
+.tabla-nomina-scroll::-webkit-scrollbar-track {
+    background: #f1f5f9;
 }
 
 .tabla-nomina-scroll::-webkit-scrollbar-thumb {
-    background: #ccc;
+    background: #94a3b8;
+    border: 2px solid #f1f5f9;
     border-radius: 10px;
 }
 
-
-/* 🔵 FILA AREA */
-.fila-area td{
-    background: linear-gradient(90deg, #0d6efd, #0b5ed7);
-    color: black;
-    font-size: 15px;
-    letter-spacing: 0.5px;
-    padding: 10px;
-    position: relative; /* 🔥 clave */
-    z-index: 1;
-    
+.tabla-nomina-scroll::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
+/* La tabla puede ser ancha, pero queda contenida dentro del scroll */
+.tabla-nomina {
+    font-size: 0.78rem;
+    margin: 0;
+    min-width: 2200px;
+    width: 2200px;
 }
 
-/* 🟣 SUBTOTAL */
-.fila-subtotal td{
-    background: #f8f9fa;
-    border-top: 2px solid #dee2e6;
-    font-size: 13px;
-    position: relative; /* 🔥 clave */
-    z-index: 1;
+/* Evita que textos largos aumenten las columnas */
+.tabla-nomina th,
+.tabla-nomina td {
+    max-width: 180px;
+    overflow: hidden;
+    padding: 0.6rem 0.5rem;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    white-space: nowrap;
 }
 
-/* 🔥 HOVER MÁS SUAVE */
-.tabla-nomina tbody tr:hover{
-    background-color: rgba(0,0,0,0.03);
-    transition: 0.2s;
+.tabla-nomina thead th {
+    position: sticky;
+    z-index: 4;
+}
+
+/* Nombre y cargo pueden tener un poco más de espacio */
+.tabla-nomina .columna-nombre {
+    max-width: 220px;
+    min-width: 190px;
+}
+.encabezado-grupos th {
+    color: #fff;
+    font-size: 0.76rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    top: 0;
+}
+
+.encabezado-columnas th {
+    background: #f1f5f9;
+    color: #334155;
+    font-size: 0.75rem;
+    font-weight: 700;
+    top: 38px;
+}
+
+.grupo-empleado {
+    background: #334155 !important;
+}
+
+.grupo-ingresos {
+    background: #047857 !important;
+}
+
+.grupo-deducciones {
+    background: #b91c1c !important;
+}
+
+.grupo-neto {
+    background: #1d4ed8 !important;
+}
+
+.grupo-aportes {
+    background: #b45309 !important;
+}
+
+.grupo-firma {
+    background: #475569 !important;
+}
+
+.fila-area td {
+    background: #eff6ff;
+    border-bottom: 1px solid #bfdbfe;
+    border-top: 2px solid #93c5fd;
+    color: #1e3a8a;
+    font-size: 0.88rem;
+    font-weight: 700;
+    padding: 0.7rem 1rem;
+    text-align: left;
+}
+
+.fila-area .badge {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.fila-empleado:hover td {
+    background-color: #f8fafc;
+}
+
+.badge-numero {
+    background: #f1f5f9;
+    border-radius: 6px;
+    color: #334155;
+    display: inline-block;
+    font-weight: 700;
+    padding: 5px 8px;
+}
+
+.columna-nombre {
+    min-width: 210px;
+}
+
+.monto {
+    font-variant-numeric: tabular-nums;
+    text-align: right !important;
+}
+
+.monto-devengado {
+    background: #ecfdf5;
+    color: #047857;
+    font-weight: 700;
+}
+
+.monto-deduccion {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+.monto-neto {
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-weight: 800;
+}
+
+.monto-aporte {
+    background: #fffbeb;
+    color: #b45309;
+}
+
+.fila-subtotal td {
+    background: #f8fafc;
+    border-bottom: 2px solid #cbd5e1;
+    color: #334155;
+    font-weight: 700;
+}
+
+.subtotal-devengado {
+    color: var(--nomina-verde) !important;
+}
+
+.subtotal-deduccion {
+    color: var(--nomina-rojo) !important;
+}
+
+.subtotal-neto {
+    color: var(--nomina-azul) !important;
+}
+
+.columna-firma {
+    min-width: 160px;
+}
+
+.linea-firma {
+    border-bottom: 1px solid #64748b;
+    height: 35px;
+    margin: 0 auto;
+    width: 130px;
+}
+
+.resumen-confirmacion {
+    background: var(--nomina-fondo);
+    border: 1px solid var(--nomina-borde);
+    border-radius: 10px;
+    display: grid;
+    gap: 10px;
+    padding: 14px;
+}
+
+.resumen-confirmacion div {
+    display: flex;
+    justify-content: space-between;
+}
+
+@media (max-width: 767.98px) {
+    .buscador-nomina {
+        min-width: 100%;
+    }
+
+    .resumen-monto {
+        font-size: 1.15rem;
+    }
+
+    .tabla-nomina-scroll {
+        max-height: 62vh;
+    }
+}
+
+@media print {
+    .btn,
+    .buscador-nomina,
+    .card-footer,
+    .nomina-alerta {
+        display: none !important;
+    }
+
+    .tabla-nomina-scroll {
+        max-height: none;
+        overflow: visible;
+    }
+
+    .tabla-nomina {
+        font-size: 7px;
+        min-width: 100%;
+    }
+
+    .tabla-nomina thead th {
+        position: static;
+    }
+
+    .nomina-card {
+        box-shadow: none !important;
+    }
 }
